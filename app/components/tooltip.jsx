@@ -8,9 +8,20 @@ class Tooltip extends React.Component {
     "target"            :     React.PropTypes.string
   };
 
+  style () {
+    const style = {
+      position      :   'absolute',
+      background    :   '#000',
+      color         :   '#fff',
+      padding       :   '8px'
+    };
+
+    return style;
+  }
+
   render () {
     return (
-      <div { ...this.props }>
+      <div { ...this.props } style={ this.style() }>
         { this.children }
       </div>
     );
