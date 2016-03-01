@@ -47,7 +47,7 @@ var Tooltip = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         _extends({}, this.props, { style: this.style() }),
-        this.children
+        this.props.children
       );
     }
   }]);
