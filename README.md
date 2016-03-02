@@ -14,7 +14,7 @@ class Layout extends React.Component {
     return (
       <div>
         <a href="#" ref="target">Click me!</a>
-        <Tooltip target="target" event="click">
+        <Tooltip reference="target" event="click">
           Hey! I am a <strong>tooltip</strong>
         </Tooltip>
       </div>

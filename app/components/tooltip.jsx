@@ -5,7 +5,7 @@ import React from 'react';
 class Tooltip extends React.Component {
 
   static propTypes      =     {
-    "target"            :     React.PropTypes.string
+    "reference"            :     React.PropTypes.string
   };
 
   style () {
@@ -20,6 +20,21 @@ class Tooltip extends React.Component {
   }
 
   render () {
+    const { reference } = this.props;
+
+    let tooltipTarget;
+
+    if ( reference ) {
+      const ref = this
+        ._reactInternalInstance
+        ._currentElement
+        ._owner
+        ._instance
+        .refs[reference];
+
+      console.info({ ref });
+    }
+
     return (
       <div { ...this.props } style={ this.style() }>
         { this.props.children }

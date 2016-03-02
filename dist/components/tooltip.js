@@ -44,6 +44,17 @@ var Tooltip = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var reference = this.props.reference;
+
+
+      var tooltipTarget = undefined;
+
+      if (reference) {
+        var ref = this._reactInternalInstance._currentElement._owner._instance.refs[reference];
+
+        console.info({ ref: ref });
+      }
+
       return _react2.default.createElement(
         'div',
         _extends({}, this.props, { style: this.style() }),
@@ -56,6 +67,6 @@ var Tooltip = function (_React$Component) {
 }(_react2.default.Component);
 
 Tooltip.propTypes = {
-  "target": _react2.default.PropTypes.string
+  "reference": _react2.default.PropTypes.string
 };
 exports.default = Tooltip;
