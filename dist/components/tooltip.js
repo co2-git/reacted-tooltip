@@ -4,13 +4,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24,19 +26,98 @@ var Tooltip = function (_React$Component) {
   _inherits(Tooltip, _React$Component);
 
   function Tooltip() {
+    var _Object$getPrototypeO;
+
+    var _temp, _this, _ret;
+
     _classCallCheck(this, Tooltip);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(Tooltip).apply(this, arguments));
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Tooltip)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.target = null, _this.tooltip = null, _this.rect = null, _this.event = {
+      in: 'mouseover',
+      out: 'mouseout'
+    }, _this.state = {
+      show: false
+    }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
   _createClass(Tooltip, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.tooltip = _reactDom2.default.findDOMNode(this.refs.tooltip);
+
+      this.event.in = this.props['event-in'];
+      this.event.out = this.props['event-out'];
+
+      var reference = this.props.reference;
+
+
+      if (reference) {
+        var ref = this._reactInternalInstance._currentElement._owner._instance.refs[reference];
+
+        this.target = _reactDom2.default.findDOMNode(ref);
+      }
+
+      if (!this.target) {
+        console.warn('Tooltip could not identify target');
+        return _react2.default.createElement('div', { style: { display: 'none' } });
+      }
+
+      this.rect = this.target.getBoundingClientRect();
+
+      console.info(this.rect);
+
+      this.target.addEventListener(this.event.in, this.triggerHandler.bind(this));
+
+      this.target.addEventListener(this.event.out, this.triggerHandler.bind(this));
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.target.removeEventListener(this.event.in, this.triggerHandler.bind(this));
+
+      this.target.removeEventListener(this.event.out, this.triggerHandler.bind(this));
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      var style = {};
+
+      if (this.state.show) {
+        this.tooltip.style.display = 'block';
+
+        var rect = this.tooltip.getBoundingClientRect();
+
+        Object.assign(style, {
+          display: 'block',
+          top: this.rect.bottom + 'px',
+          left: this.rect.left + this.rect.width / 2 - rect.width / 2 + 'px'
+        });
+
+        for (var property in style) {
+          this.tooltip.style[property] = style[property];
+        }
+      } else {
+        this.tooltip.style.display = 'none';
+      }
+    }
+  }, {
+    key: 'triggerHandler',
+    value: function triggerHandler(e) {
+      this.setState({ show: !this.state.show });
+    }
+  }, {
     key: 'style',
     value: function style() {
       var style = {
         position: 'absolute',
         background: '#000',
         color: '#fff',
-        padding: '8px'
+        padding: '8px',
+        display: 'none'
       };
 
       return style;
@@ -44,21 +125,12 @@ var Tooltip = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var reference = this.props.reference;
-
-
-      var tooltipTarget = undefined;
-
-      if (reference) {
-        var ref = this._reactInternalInstance._currentElement._owner._instance.refs[reference];
-
-        console.info({ ref: ref });
-      }
+      var children = this.state.show ? this.props.children : null;
 
       return _react2.default.createElement(
         'div',
-        _extends({}, this.props, { style: this.style() }),
-        this.props.children
+        { style: this.style(), ref: 'tooltip' },
+        children
       );
     }
   }]);
@@ -67,6 +139,8 @@ var Tooltip = function (_React$Component) {
 }(_react2.default.Component);
 
 Tooltip.propTypes = {
-  "reference": _react2.default.PropTypes.string
+  "reference": _react2.default.PropTypes.string,
+  "event-in": _react2.default.PropTypes.string,
+  "event-out": _react2.default.PropTypes.string
 };
 exports.default = Tooltip;

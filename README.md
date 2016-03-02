@@ -22,3 +22,16 @@ class Layout extends React.Component {
   }
 }
 ```
+
+# Identify target
+
+## Using reference
+
+```html
+<div>
+  <a href="#" ref="target">Click me!</a>
+  <Tooltip reference="target" event="click">
+    Hey! I am a <strong>tooltip</strong>
+  </Tooltip>
+</div>
+```
