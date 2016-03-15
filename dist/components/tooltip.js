@@ -120,16 +120,18 @@ var Tooltip = function (_React$Component) {
         display: 'none'
       };
 
-      return style;
+      return Object.assign({}, style, this.props.style);
     }
   }, {
     key: 'render',
     value: function render() {
       var children = this.state.show ? this.props.children : null;
 
+      var className = this.props.className || 'reacted-tooltip';
+
       return _react2.default.createElement(
         'div',
-        { style: this.style(), ref: 'tooltip' },
+        { style: this.style(), ref: 'tooltip', className: className },
         children
       );
     }
@@ -141,6 +143,8 @@ var Tooltip = function (_React$Component) {
 Tooltip.propTypes = {
   "reference": _react2.default.PropTypes.string,
   "event-in": _react2.default.PropTypes.string,
-  "event-out": _react2.default.PropTypes.string
+  "event-out": _react2.default.PropTypes.string,
+  "style": _react2.default.PropTypes.object,
+  "className": _react2.default.PropTypes.string
 };
 exports.default = Tooltip;
