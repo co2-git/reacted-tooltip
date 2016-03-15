@@ -8,7 +8,9 @@ class Tooltip extends React.Component {
   static propTypes          =     {
     "reference"             :     React.PropTypes.string,
     "event-in"              :     React.PropTypes.string,
-    "event-out"             :     React.PropTypes.string
+    "event-out"             :     React.PropTypes.string,
+    "style"                 :     React.PropTypes.object,
+    "className"             :     React.PropTypes.string
   };
 
   target = null;
@@ -102,14 +104,16 @@ class Tooltip extends React.Component {
       display       :   'none'
     };
 
-    return style;
+    return Object.assign({}, style, this.props.style);
   }
 
   render () {
     let children = this.state.show ? this.props.children : null;
 
+    const className = this.props.className || 'reacted-tooltip';
+
     return (
-      <div style={ this.style() } ref="tooltip">
+      <div style={ this.style() } ref="tooltip" className={ className }>
         { children }
       </div>
     );
