@@ -39,16 +39,19 @@ var Tooltip = function (_React$Component) {
     return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Tooltip)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.target = null, _this.tooltip = null, _this.rect = null, _this.event = {
       in: 'mouseover',
       out: 'mouseout'
-    }, _this.state = {
-      show: false
+    }, _this.id = Tooltip.id, _this.state = {
+      showChildren: false
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
   _createClass(Tooltip, [{
     key: 'componentDidMount',
+
+
+    /** */
+
     value: function componentDidMount() {
-      console.log(this.props);
-      this.tooltip = _reactDom2.default.findDOMNode(this.refs.tooltip);
+      this.tooltip = document.querySelector('[data-reacted-id="' + this.id + '"]');
 
       this.event.in = this.props['event-in'];
       this.event.out = this.props['event-out'];
@@ -89,20 +92,30 @@ var Tooltip = function (_React$Component) {
     value: function componentDidUpdate() {
       var style = {};
 
-      if (this.state.show) {
+      if (this.state.showChildren) {
+        var adjust = {};
+
         this.tooltip.style.display = 'block';
 
-        var rect = this.tooltip.getBoundingClientRect();
+        var target = this.target.getBoundingClientRect();
 
-        Object.assign(style, {
-          display: 'block',
-          top: this.rect.bottom + 'px',
-          left: this.rect.left + this.rect.width / 2 - rect.width / 2 + 'px'
-        });
+        var tooltipRect = this.tooltip.getBoundingClientRect();
 
-        for (var property in style) {
-          this.tooltip.style[property] = style[property];
+        var targetRect = this.target.getBoundingClientRect();
+
+        var wheight = +window.innerHeight;
+
+        var top = target.bottom;
+
+        var spaceHeight = wheight - tooltipRect.height;
+
+        if (top >= spaceHeight) {
+          top = spaceHeight - tooltipRect.height;
         }
+
+        this.tooltip.style.top = top + 'px';
+
+        this.tooltip.style.left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2 + 'px';
       } else {
         this.tooltip.style.display = 'none';
       }
@@ -110,7 +123,8 @@ var Tooltip = function (_React$Component) {
   }, {
     key: 'triggerHandler',
     value: function triggerHandler(e) {
-      this.setState({ show: !this.state.show });
+      this.setState({ showChildren: !this.state.showChildren });
+      this.componentDidUpdate();
     }
   }, {
     key: 'style',
@@ -120,7 +134,8 @@ var Tooltip = function (_React$Component) {
         background: '#000',
         color: '#fff',
         padding: '8px',
-        display: 'none'
+        display: 'none',
+        zIndex: 9999999999
       };
 
       return Object.assign({}, style, this.props.style);
@@ -128,13 +143,13 @@ var Tooltip = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var children = this.state.show ? this.props.children : null;
+      var children = this.state.showChildren ? this.props.children : null;
 
       var className = this.props.className || 'reacted-tooltip';
 
       return _react2.default.createElement(
         'div',
-        { style: this.style(), ref: 'tooltip', className: className },
+        { style: this.style(), ref: 'tooltip', className: className, 'data-reacted-id': this.id },
         children
       );
     }
@@ -143,6 +158,7 @@ var Tooltip = function (_React$Component) {
   return Tooltip;
 }(_react2.default.Component);
 
+Tooltip.id = 0;
 Tooltip.propTypes = {
   "reference": _react2.default.PropTypes.string,
   "selector": _react2.default.PropTypes.string,

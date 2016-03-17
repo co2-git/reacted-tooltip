@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom';
 
 class Tooltip extends React.Component {
 
+  static id = 0;
+
   static propTypes          =     {
     "reference"             :     React.PropTypes.string,
     "selector"              :     React.PropTypes.string,
@@ -14,21 +16,23 @@ class Tooltip extends React.Component {
     "className"             :     React.PropTypes.string
   };
 
-  target = null;
-  tooltip = null;
-  rect = null;
-  event = {
-    in : 'mouseover',
-    out : 'mouseout'
+  target                    =     null;
+  tooltip                   =     null;
+  rect                      =     null;
+  event                     =     {
+    in                      :     'mouseover',
+    out                     :     'mouseout'
   };
+  id                        =     Tooltip.id;
 
   state = {
-    show : false
+    showChildren : false
   };
 
+  /** */
+
   componentDidMount () {
-    console.log(this.props);
-    this.tooltip = ReactDOM.findDOMNode(this.refs.tooltip);
+    this.tooltip = document.querySelector(`[data-reacted-id="${this.id}"]`);
 
     this.event.in = this.props['event-in'];
     this.event.out = this.props['event-out'];
@@ -75,20 +79,30 @@ class Tooltip extends React.Component {
   componentDidUpdate () {
     const style = {};
 
-    if ( this.state.show ) {
+    if ( this.state.showChildren ) {
+      const adjust = {};
+
       this.tooltip.style.display = 'block';
 
-      const rect = this.tooltip.getBoundingClientRect();
+      const target = this.target.getBoundingClientRect();
 
-      Object.assign(style, {
-        display         :   'block',
-        top             :   this.rect.bottom + 'px',
-        left            :   (this.rect.left + (this.rect.width / 2) - (rect.width / 2)) + 'px'
-      });
+      const tooltipRect = this.tooltip.getBoundingClientRect();
 
-      for ( const property in style ) {
-        this.tooltip.style[property] = style[property];
+      const targetRect = this.target.getBoundingClientRect();
+
+      const wheight = +(window.innerHeight);
+
+      let top = target.bottom;
+
+      let spaceHeight = wheight - tooltipRect.height;
+
+      if ( top >= spaceHeight ) {
+        top = (spaceHeight - tooltipRect.height);
       }
+
+      this.tooltip.style.top = `${top}px`;
+
+      this.tooltip.style.left = `${targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2)}px`;
     }
     else {
       this.tooltip.style.display = 'none';
@@ -96,7 +110,8 @@ class Tooltip extends React.Component {
   }
 
   triggerHandler (e) {
-    this.setState({ show : ! this.state.show });
+    this.setState({ showChildren : ! this.state.showChildren });
+    this.componentDidUpdate();
   }
 
   style () {
@@ -105,19 +120,20 @@ class Tooltip extends React.Component {
       background    :   '#000',
       color         :   '#fff',
       padding       :   '8px',
-      display       :   'none'
+      display       :   'none',
+      zIndex: 9999999999
     };
 
     return Object.assign({}, style, this.props.style);
   }
 
   render () {
-    let children = this.state.show ? this.props.children : null;
+    let children = this.state.showChildren ? this.props.children : null;
 
     const className = this.props.className || 'reacted-tooltip';
 
     return (
-      <div style={ this.style() } ref="tooltip" className={ className }>
+      <div style={ this.style() } ref="tooltip" className={ className } data-reacted-id={ this.id }>
         { children }
       </div>
     );
