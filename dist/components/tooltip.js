@@ -47,28 +47,31 @@ var Tooltip = function (_React$Component) {
   _createClass(Tooltip, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      console.log(this.props);
       this.tooltip = _reactDom2.default.findDOMNode(this.refs.tooltip);
 
       this.event.in = this.props['event-in'];
       this.event.out = this.props['event-out'];
 
-      var reference = this.props.reference;
+      var _props = this.props;
+      var reference = _props.reference;
+      var selector = _props.selector;
 
 
       if (reference) {
         var ref = this._reactInternalInstance._currentElement._owner._instance.refs[reference];
 
         this.target = _reactDom2.default.findDOMNode(ref);
+      } else if (selector) {
+        this.target = document.querySelector(selector);
       }
 
       if (!this.target) {
-        console.warn('Tooltip could not identify target');
+        console.warn('Tooltip could not identify target', this.props);
         return _react2.default.createElement('div', { style: { display: 'none' } });
       }
 
       this.rect = this.target.getBoundingClientRect();
-
-      console.info(this.rect);
 
       this.target.addEventListener(this.event.in, this.triggerHandler.bind(this));
 
@@ -142,6 +145,7 @@ var Tooltip = function (_React$Component) {
 
 Tooltip.propTypes = {
   "reference": _react2.default.PropTypes.string,
+  "selector": _react2.default.PropTypes.string,
   "event-in": _react2.default.PropTypes.string,
   "event-out": _react2.default.PropTypes.string,
   "style": _react2.default.PropTypes.object,
