@@ -14,6 +14,7 @@ class Layout extends React.Component {
     return (
       <div>
         <a href="#" ref="target">Click me!</a>
+
         <Tooltip reference="target" event="click">
           Hey! I am a <strong>tooltip</strong>
         </Tooltip>
@@ -29,9 +30,18 @@ class Layout extends React.Component {
 
 ```html
 <div>
-  <a href="#" ref="target">Click me!</a>
-  <Tooltip reference="target" event="click">
-    Hey! I am a <strong>tooltip</strong>
-  </Tooltip>
+  <div ref="target" />
+
+  <Tooltip reference="target" />
+</div>
+```
+
+## Using DOM selector
+
+```html
+<div>
+  <div id="target" />
+
+  <Tooltip selector="#target" />
 </div>
 ```

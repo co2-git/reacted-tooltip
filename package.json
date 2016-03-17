@@ -1,6 +1,6 @@
 {
   "name": "reacted-tooltip",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "reacted-tooltip ===",
   "main": "dist/components/tooltip.js",
   "scripts": {

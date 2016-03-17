@@ -7,6 +7,7 @@ class Tooltip extends React.Component {
 
   static propTypes          =     {
     "reference"             :     React.PropTypes.string,
+    "selector"              :     React.PropTypes.string,
     "event-in"              :     React.PropTypes.string,
     "event-out"             :     React.PropTypes.string,
     "style"                 :     React.PropTypes.object,
@@ -31,7 +32,7 @@ class Tooltip extends React.Component {
     this.event.in = this.props['event-in'];
     this.event.out = this.props['event-out'];
 
-    const { reference } = this.props;
+    const { reference, selector } = this.props;
 
     if ( reference ) {
       const ref = this
@@ -42,6 +43,10 @@ class Tooltip extends React.Component {
         .refs[reference];
 
       this.target = ReactDOM.findDOMNode(ref);
+    }
+
+    else if ( selector ) {
+      this.target = document.querySelector(selector);
     }
 
     if ( ! this.target ) {
