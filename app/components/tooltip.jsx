@@ -27,6 +27,7 @@ class Tooltip extends React.Component {
   };
 
   componentDidMount () {
+    console.log(this.props);
     this.tooltip = ReactDOM.findDOMNode(this.refs.tooltip);
 
     this.event.in = this.props['event-in'];
@@ -50,13 +51,11 @@ class Tooltip extends React.Component {
     }
 
     if ( ! this.target ) {
-      console.warn('Tooltip could not identify target');
+      console.warn('Tooltip could not identify target', this.props);
       return ( <div style={{ display : 'none' }}/> );
     }
 
     this.rect = this.target.getBoundingClientRect();
-
-    console.info(this.rect);
 
     this.target
       .addEventListener(this.event.in, this.triggerHandler.bind(this));
