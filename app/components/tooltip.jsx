@@ -3,20 +3,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-let hack;
-
-function foo (e) {
-  const event = {};
-
-  for ( let i in e ) {
-    if ( i !== 'webkitMovementX' && i !== 'webkitMovementY' ) {
-      Object.assign(event, { [i] : e[i] });
-    }
-  }
-
-  return hack.triggerHandler(event);
-}
-
 class Tooltip extends React.Component {
 
   /** */
@@ -45,7 +31,7 @@ class Tooltip extends React.Component {
     in                      :     'mouseover',
     out                     :     'mouseout'
   };
-  id                        =     Tooltip.id;
+  id                        =     Tooltip.id++;
 
   /** */
 
@@ -58,7 +44,7 @@ class Tooltip extends React.Component {
   constructor(props) {
     super(props);
 
-    hack = this;
+    this.persistTrigger = ::this.triggerHandler;
   }
 
   /** */
@@ -73,8 +59,8 @@ class Tooltip extends React.Component {
     this.pointer = props.pointer;
     this.event = props.event;
 
-    this.target.addEventListener(this.event.in, foo, false);
-    this.target.addEventListener(this.event.out, foo, false);
+    this.target.addEventListener(this.event.in, this.persistTrigger, false);
+    this.target.addEventListener(this.event.out, this.persistTrigger, false);
   }
 
   /** */
@@ -84,25 +70,25 @@ class Tooltip extends React.Component {
 
     if ( info.target !== this.target ) {
 
-      this.target.removeEventListener(this.event.in, foo, false);
+      this.target.removeEventListener(this.event.in, this.persistTrigger, false);
 
-      this.target.removeEventListener(this.event.out, foo, false);
+      this.target.removeEventListener(this.event.out, this.persistTrigger, false);
     }
 
     this.target = info.target;
 
     if ( info.event.in !== this.event.in ) {
 
-      this.target.removeEventListener(this.event.in, foo, false);
+      this.target.removeEventListener(this.event.in, this.persistTrigger, false);
 
-      this.target.addEventListener(info.event.in, foo, false);
+      this.target.addEventListener(info.event.in, this.persistTrigger, false);
     }
 
     if ( info.event.out !== this.event.out ) {
 
-      this.target.removeEventListener(this.event.out, foo, false);
+      this.target.removeEventListener(this.event.out, this.persistTrigger, false);
 
-      this.target.addEventListener(info.event.out, foo, false);
+      this.target.addEventListener(info.event.out, this.persistTrigger, false);
     }
 
     this.event = info.event;
