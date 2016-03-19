@@ -22,22 +22,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var hack = undefined;
-
-function foo(e) {
-  var event = {};
-
-  for (var i in e) {
-    if (i !== 'webkitMovementX' && i !== 'webkitMovementY') {
-      Object.assign(event, _defineProperty({}, i, e[i]));
-    }
-  }
-
-  return hack.triggerHandler(event);
-}
-
 var Tooltip = function (_React$Component) {
   _inherits(Tooltip, _React$Component);
 
@@ -58,13 +42,13 @@ var Tooltip = function (_React$Component) {
       in: 'mouseover',
       out: 'mouseout'
     };
-    _this.id = Tooltip.id;
+    _this.id = Tooltip.id++;
     _this.state = {
       show: false
     };
 
 
-    hack = _this;
+    _this.persistTrigger = _this.triggerHandler.bind(_this);
     return _this;
   }
 
@@ -88,8 +72,8 @@ var Tooltip = function (_React$Component) {
       this.pointer = props.pointer;
       this.event = props.event;
 
-      this.target.addEventListener(this.event.in, foo, false);
-      this.target.addEventListener(this.event.out, foo, false);
+      this.target.addEventListener(this.event.in, this.persistTrigger, false);
+      this.target.addEventListener(this.event.out, this.persistTrigger, false);
     }
 
     /** */
@@ -101,25 +85,25 @@ var Tooltip = function (_React$Component) {
 
       if (info.target !== this.target) {
 
-        this.target.removeEventListener(this.event.in, foo, false);
+        this.target.removeEventListener(this.event.in, this.persistTrigger, false);
 
-        this.target.removeEventListener(this.event.out, foo, false);
+        this.target.removeEventListener(this.event.out, this.persistTrigger, false);
       }
 
       this.target = info.target;
 
       if (info.event.in !== this.event.in) {
 
-        this.target.removeEventListener(this.event.in, foo, false);
+        this.target.removeEventListener(this.event.in, this.persistTrigger, false);
 
-        this.target.addEventListener(info.event.in, foo, false);
+        this.target.addEventListener(info.event.in, this.persistTrigger, false);
       }
 
       if (info.event.out !== this.event.out) {
 
-        this.target.removeEventListener(this.event.out, foo, false);
+        this.target.removeEventListener(this.event.out, this.persistTrigger, false);
 
-        this.target.addEventListener(info.event.out, foo, false);
+        this.target.addEventListener(info.event.out, this.persistTrigger, false);
       }
 
       this.event = info.event;
