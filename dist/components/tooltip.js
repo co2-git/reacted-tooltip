@@ -22,128 +22,280 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var hack = undefined;
+
+function foo(e) {
+  var event = {};
+
+  for (var i in e) {
+    if (i !== 'webkitMovementX' && i !== 'webkitMovementY') {
+      Object.assign(event, _defineProperty({}, i, e[i]));
+    }
+  }
+
+  return hack.triggerHandler(event);
+}
+
 var Tooltip = function (_React$Component) {
   _inherits(Tooltip, _React$Component);
 
-  function Tooltip() {
-    var _Object$getPrototypeO;
+  /** */
 
-    var _temp, _this, _ret;
+  /** */
 
+  function Tooltip(props) {
     _classCallCheck(this, Tooltip);
 
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Tooltip).call(this, props));
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Tooltip)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.target = null, _this.tooltip = null, _this.rect = null, _this.event = {
+    _this.method = null;
+    _this.target = null;
+    _this.tooltip = null;
+    _this.rect = null;
+    _this.event = {
       in: 'mouseover',
       out: 'mouseout'
-    }, _this.id = Tooltip.id, _this.state = {
-      showChildren: false
-    }, _temp), _possibleConstructorReturn(_this, _ret);
+    };
+    _this.id = Tooltip.id;
+    _this.state = {
+      show: false
+    };
+
+
+    hack = _this;
+    return _this;
   }
+
+  /** */
+
+  /** */
+
+  /** */
+
+  /** */
 
   _createClass(Tooltip, [{
     key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.tooltip = _reactDom2.default.findDOMNode(this.refs.tooltip);
 
+      var props = this.getProperties();
+
+      this.method = props.method;
+      this.target = props.target;
+      this.pointer = props.pointer;
+      this.event = props.event;
+
+      this.target.addEventListener(this.event.in, foo, false);
+      this.target.addEventListener(this.event.out, foo, false);
+    }
 
     /** */
 
-    value: function componentDidMount() {
-      this.tooltip = document.querySelector('[data-reacted-id="' + this.id + '"]');
-
-      this.event.in = this.props['event-in'];
-      this.event.out = this.props['event-out'];
-
-      var _props = this.props;
-      var reference = _props.reference;
-      var selector = _props.selector;
-
-
-      if (reference) {
-        var ref = this._reactInternalInstance._currentElement._owner._instance.refs[reference];
-
-        this.target = _reactDom2.default.findDOMNode(ref);
-      } else if (selector) {
-        this.target = document.querySelector(selector);
-      }
-
-      if (!this.target) {
-        console.warn('Tooltip could not identify target', this.props);
-        return _react2.default.createElement('div', { style: { display: 'none' } });
-      }
-
-      this.rect = this.target.getBoundingClientRect();
-
-      this.target.addEventListener(this.event.in, this.triggerHandler.bind(this));
-
-      this.target.addEventListener(this.event.out, this.triggerHandler.bind(this));
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      this.target.removeEventListener(this.event.in, this.triggerHandler.bind(this));
-
-      this.target.removeEventListener(this.event.out, this.triggerHandler.bind(this));
-    }
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
+      var info = this.getProperties();
+
+      if (info.target !== this.target) {
+
+        this.target.removeEventListener(this.event.in, foo, false);
+
+        this.target.removeEventListener(this.event.out, foo, false);
+      }
+
+      this.target = info.target;
+
+      if (info.event.in !== this.event.in) {
+
+        this.target.removeEventListener(this.event.in, foo, false);
+
+        this.target.addEventListener(info.event.in, foo, false);
+      }
+
+      if (info.event.out !== this.event.out) {
+
+        this.target.removeEventListener(this.event.out, foo, false);
+
+        this.target.addEventListener(info.event.out, foo, false);
+      }
+
+      this.event = info.event;
+
+      this.method = info.method;
+      this.pointer = info.pointer;
+
+      if (this.triggerEvent) {
+
+        if (this.state.show) {
+          this.tooltip.style.display = 'block';
+
+          var top = 0,
+              left = 0;
+
+          if (this.props.pointer) {
+            top = this.triggerEvent.x;
+            left = this.triggerEvent.y;
+          } else {
+            var target = this.target.getBoundingClientRect();
+
+            var tooltipRect = this.tooltip.getBoundingClientRect();
+
+            var targetRect = this.target.getBoundingClientRect();
+
+            var wheight = +window.innerHeight;
+
+            top = target.bottom;
+
+            var spaceHeight = wheight - tooltipRect.height;
+
+            if (top >= spaceHeight) {
+              top = spaceHeight - tooltipRect.height;
+            }
+
+            left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
+
+            if (left < 0) {
+              left = 0;
+            }
+          }
+
+          this.tooltip.style.top = top + 'px';
+
+          this.tooltip.style.left = left + 'px';
+        } else {
+          this.tooltip.style.display = 'none';
+        }
+
+        this.triggerEvent = false;
+      }
+
+      return;
+
       var style = {};
 
-      if (this.state.showChildren) {
+      if (this.state.show) {
         var adjust = {};
 
         this.tooltip.style.display = 'block';
 
-        var target = this.target.getBoundingClientRect();
+        var top = 0,
+            left = 0;
 
-        var tooltipRect = this.tooltip.getBoundingClientRect();
+        if (this.props.pointer) {
 
-        var targetRect = this.target.getBoundingClientRect();
+          top = this.triggerEvent.x;
+          left = this.triggerEvent.y;
+        } else {
+          var target = this.target.getBoundingClientRect();
 
-        var wheight = +window.innerHeight;
+          var tooltipRect = this.tooltip.getBoundingClientRect();
 
-        var top = target.bottom;
+          var targetRect = this.target.getBoundingClientRect();
 
-        var spaceHeight = wheight - tooltipRect.height;
+          var wheight = +window.innerHeight;
 
-        if (top >= spaceHeight) {
-          top = spaceHeight - tooltipRect.height;
+          top = target.bottom;
+
+          var spaceHeight = wheight - tooltipRect.height;
+
+          if (top >= spaceHeight) {
+            top = spaceHeight - tooltipRect.height;
+          }
+
+          left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
         }
 
         this.tooltip.style.top = top + 'px';
 
-        this.tooltip.style.left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2 + 'px';
+        this.tooltip.style.left = left + 'px';
       } else {
         this.tooltip.style.display = 'none';
       }
     }
+
+    /** */
+
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.target.removeEventListener(this.event.in, this.triggerHandler.bind(this), false);
+
+      this.target.removeEventListener(this.event.out, this.triggerHandler.bind(this), false);
+    }
+
+    /** */
+
+  }, {
+    key: 'getProperties',
+    value: function getProperties(props) {
+      props = props || this.props;
+
+      var method = undefined,
+          target = undefined,
+          event = { in: 'mouseover', out: 'mouseout' },
+          pointer = false;
+
+      if (props.reference) {
+        method = 'reference';
+
+        var ref = this._reactInternalInstance._currentElement._owner._instance.refs[props.reference];
+
+        target = _reactDom2.default.findDOMNode(ref);
+      } else if (props.selector) {
+        method = 'selector';
+
+        target = document.querySelector(props.selector);
+      }
+
+      if (props.pointer) {
+        pointer = true;
+
+        target = target || document.body;
+      }
+
+      event.in = props['event-in'] || 'mouseover';
+      event.out = props['event-out'] || 'mouseout';
+
+      return { method: method, target: target, event: event, pointer: pointer };
+    }
+
+    /** */
+
   }, {
     key: 'triggerHandler',
     value: function triggerHandler(e) {
-      this.setState({ showChildren: !this.state.showChildren });
-      this.componentDidUpdate();
+
+      this.triggerEvent = Object.assign({}, e);
+
+      this.setState({ show: !this.state.show });
     }
+
+    /** */
+
   }, {
     key: 'style',
     value: function style() {
       var style = {
-        position: 'absolute',
+        position: 'fixed',
         background: '#000',
         color: '#fff',
-        padding: '8px',
+        padding: 8,
         display: 'none',
-        zIndex: 9999999999
+        zIndex: 9999
       };
 
       return Object.assign({}, style, this.props.style);
     }
+
+    /** */
+
   }, {
     key: 'render',
     value: function render() {
-      var children = this.state.showChildren ? this.props.children : null;
+      var children = this.state.show ? this.props.children : null;
 
       var className = this.props.className || 'reacted-tooltip';
 
@@ -162,6 +314,7 @@ Tooltip.id = 0;
 Tooltip.propTypes = {
   "reference": _react2.default.PropTypes.string,
   "selector": _react2.default.PropTypes.string,
+  "pointer": _react2.default.PropTypes.bool,
   "event-in": _react2.default.PropTypes.string,
   "event-out": _react2.default.PropTypes.string,
   "style": _react2.default.PropTypes.object,

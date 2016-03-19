@@ -45,3 +45,9 @@ class Layout extends React.Component {
   <Tooltip selector="#target" />
 </div>
 ```
+
+## Use pointer as target
+
+```html
+<Tooltip pointer />
+```

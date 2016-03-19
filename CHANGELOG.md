@@ -13,3 +13,8 @@
 ===
 
 - top readjusts so it stays visible in viewport
+
+0.0.5
+===
+
+- use cursor for target
